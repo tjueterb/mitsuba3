@@ -2,6 +2,17 @@
 
 import sys as _sys
 import os as _os
+
+if _sys.platform.startswith("linux"):
+    # Preload libstdc++ so std:: symbols don't resolve into incomplete
+    # copies exported by vendored libraries (segfault with --as-needed
+    # linkers that drop the libstdc++.so.6 dependency).
+    import ctypes as _ctypes
+    try:
+        _ctypes.CDLL("libstdc++.so.6", mode=_ctypes.RTLD_GLOBAL)
+    except OSError:
+        pass
+
 import drjit as _dr
 import logging
 
